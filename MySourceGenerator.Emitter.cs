@@ -82,14 +82,17 @@ public partial class MySourceGenerator
                     }
                     foreach (var r in _results)
                     {
-                        w.WriteLine(w =>
+                        if (r.PropertyNames.Count > 0)
                         {
-                            w.Write("global::CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.JsonSerializers.MultipleContextHelpers.AddContext<")
-                            .Write(r.GetGlobalName)
-                            .Write(">(options => options.AddContext<")
-                            .Write(r.GetGlobalName)
-                            .Write("Context>());");
-                        });
+                            w.WriteLine(w =>
+                            {
+                                w.Write("global::CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.JsonSerializers.MultipleContextHelpers.AddContext<")
+                                .Write(r.GetGlobalName)
+                                .Write(">(options => options.AddContext<")
+                                .Write(r.GetGlobalName)
+                                .Write("Context>());");
+                            });
+                        }
                     }
                 });
             });
