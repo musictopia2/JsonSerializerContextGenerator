@@ -62,6 +62,10 @@ internal record struct TypeModel
     }
     public bool NeedsSerialization()
     {
+        if (TypeCategory == EnumTypeCategory.Struct)
+        {
+            return true;
+        }
         if (TypeCategory == EnumTypeCategory.StandardSimple && ListCategory == EnumListCategory.Single)
         {
             return TypeName is not "Object";

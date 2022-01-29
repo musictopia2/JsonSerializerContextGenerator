@@ -62,6 +62,10 @@ public partial class MySourceGenerator
                     {
                         SerializeList(w);
                     }
+                    else if (_info.TypeCategory == EnumTypeCategory.Struct)
+                    {
+                        SerializeStruct(w);
+                    }
                     else
                     {
                         w.WriteLine("//Unable to figure out the serialization for now");
@@ -158,6 +162,69 @@ public partial class MySourceGenerator
                     .Write("(value[i]);");
                 });
             }
+            private void SerializeStruct(ICodeBlock w)
+            {
+                w.WriteLine("writer.WriteStartObject();");
+                var list = _info.SymbolUsed!.GetAllPublicProperties();
+                foreach (var p in list)
+                {
+                    if (p.PropertyIgnored(_ignoreList))
+                    {
+                        continue;
+                    }
+                    FinishWriteProperty(w, p);
+                }
+                w.WriteLine("writer.WriteEndObject();");
+
+            }
+            private void FinishWriteProperty(ICodeBlock w, IPropertySymbol p)
+            {
+                EnumTypeCategory typeCategory = p.Type.GetSimpleCategory();
+                EnumListCategory listCategory = p.GetListCategory();
+                if (listCategory != EnumListCategory.None)
+                {
+                    WriteListSerializer(w, p, p.Type, listCategory);
+                    return;
+                }
+                if (typeCategory == EnumTypeCategory.StandardSimple && p.Type.IsNullable() == false)
+                {
+                    string value = p.Type.SerializerSimpleValue();
+                    value = value.Replace("Value", "");
+                    w.WriteLine(w =>
+                    {
+                        w.Write("writer.")
+                        .Write(value)
+                        .Write("(PropName_")
+                        .Write(p.Name)
+                        .Write(", value!.")
+                        .Write(p.Name)
+                        .Write(");");
+                    });
+                    return;
+                }
+                if (p.Type.IsNullable())
+                {
+                    ITypeSymbol nullUnder = p.Type.GetSingleGenericTypeUsed()!;
+                    WriteNullableValue(w, p, nullUnder);
+                    return;
+                }
+                if (typeCategory == EnumTypeCategory.CustomEnum)
+                {
+                    w.WriteLine(w =>
+                    {
+                        w.Write("writer.WriteStringValue(value!.")
+                        .Write(p.Name)
+                          .Write(".Name);");
+                    });
+                    return;
+                }
+                if (typeCategory == EnumTypeCategory.Complex)
+                {
+                    WriteSimpleSerializer(w, p, p.Type);
+                    return;
+                }
+                WriteSymbolValue(w, p, p.Type);
+            }
             private void SerializeComplex(ICodeBlock w)
             {
                 w.WriteLine("writer.WriteStartObject();");
@@ -168,52 +235,8 @@ public partial class MySourceGenerator
                     {
                         continue;
                     }
-                    EnumTypeCategory typeCategory = p.Type.GetSimpleCategory();
-                    EnumListCategory listCategory = p.GetListCategory();
                     w.WritePropertyValue(p);
-                    if (listCategory != EnumListCategory.None)
-                    {
-                        WriteListSerializer(w, p, p.Type, listCategory);
-                        continue;
-                    }
-                    if (typeCategory == EnumTypeCategory.StandardSimple && p.Type.IsNullable() == false)
-                    {
-                        string value = p.Type.SerializerSimpleValue();
-                        value = value.Replace("Value", "");
-                        w.WriteLine(w =>
-                        {
-                            w.Write("writer.")
-                            .Write(value)
-                            .Write("(PropName_")
-                            .Write(p.Name)
-                            .Write(", value!.")
-                            .Write(p.Name)
-                            .Write(");");
-                        });
-                        continue;
-                    }
-                    if (p.Type.IsNullable())
-                    {
-                        ITypeSymbol nullUnder = p.Type.GetSingleGenericTypeUsed()!;
-                        WriteNullableValue(w, p, nullUnder);
-                        continue;
-                    }
-                    if (typeCategory == EnumTypeCategory.CustomEnum)
-                    {
-                        w.WriteLine(w =>
-                        {
-                            w.Write("writer.WriteStringValue(value!.")
-                            .Write(p.Name)
-                              .Write(".Name);");
-                        });
-                        continue;
-                    }
-                    if (typeCategory == EnumTypeCategory.Complex)
-                    {
-                        WriteSimpleSerializer(w, p, p.Type);
-                        continue;
-                    }
-                    WriteSymbolValue(w, p, p.Type);
+                    FinishWriteProperty(w, p);
                 }
                 w.WriteLine("writer.WriteEndObject();");
             }
@@ -270,7 +293,7 @@ public partial class MySourceGenerator
                     .Write("!);");
                 });
             }
-            #endregion
+#endregion
             private string GetListValue(ITypeSymbol symbol, EnumListCategory list)
             {
                 string collectionName = symbol.Name;
@@ -297,7 +320,7 @@ public partial class MySourceGenerator
                 }
                 return $"{collectionName}{collectionName}{gg!.Name}";
             }
-            #region Property Processes
+#region Property Processes
             private void PropertyInitProcesses(ICodeBlock w)
             {
                 if (_info.ListCategory is not EnumListCategory.None)
@@ -308,7 +331,7 @@ public partial class MySourceGenerator
                 {
                     return;
                 }
-                if (_info.TypeCategory is not EnumTypeCategory.Complex)
+                if (_info.TypeCategory is not EnumTypeCategory.Complex && _info.TypeCategory is not EnumTypeCategory.Struct)
                 {
                     return;
                 }
@@ -406,7 +429,7 @@ public partial class MySourceGenerator
                        .WriteLine("Setter = null,")
                        .WriteLine("IgnoreCondition = global::System.Text.Json.Serialization.JsonIgnoreCondition.Always,");
                     }
-                    else if (category == EnumRecordCategory.Record)
+                    else if (category == EnumRecordCategory.Record || category == EnumRecordCategory.Struct)
                     {
                         w.WriteLine(w =>
                         {
@@ -529,8 +552,8 @@ public partial class MySourceGenerator
                    .Write(">>>");
                 }
             }
-            #endregion
-            #region JsonInfo
+#endregion
+#region JsonInfo
             private void JsonTypeProcess(ICodeBlock w)
             {
                 VariableInformation variable = _info.GetVariableInformation();
@@ -611,7 +634,7 @@ public partial class MySourceGenerator
             }
             private bool NeedsCustomConverter()
             {
-                if (_info.TypeCategory == EnumTypeCategory.Complex)
+                if (_info.TypeCategory == EnumTypeCategory.Complex || _info.TypeCategory == EnumTypeCategory.Struct)
                 {
                     return true;
                 }
@@ -850,7 +873,7 @@ public partial class MySourceGenerator
                     .Write("));");
                 });
             }
-            #endregion
+#endregion
         }
     }
 }

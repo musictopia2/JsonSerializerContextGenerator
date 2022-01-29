@@ -18,6 +18,10 @@ internal static class SymbolExtensions
         {
             firsts = symbol;
         }
+        if (firsts.TypeKind == TypeKind.Struct)
+        {
+            return EnumRecordCategory.Struct; //not just record category anymore but did not know unfortunately.
+        }
         if (firsts.IsRecord == false)
         {
             return EnumRecordCategory.None;
@@ -132,10 +136,6 @@ internal static class SymbolExtensions
     }
     public static EnumTypeCategory GetSimpleCategory(this ITypeSymbol symbol)
     {
-        if (symbol.IsKnownType() == false)
-        {
-            return EnumTypeCategory.Complex;
-        }
         if (symbol.TypeKind == TypeKind.Enum)
         {
             return EnumTypeCategory.StandardEnum;
@@ -143,6 +143,14 @@ internal static class SymbolExtensions
         if (symbol.Name.StartsWith("Enum"))
         {
             return EnumTypeCategory.CustomEnum;
+        }
+        if (symbol.IsKnownType() == false)
+        {
+            if (symbol.TypeKind == TypeKind.Struct)
+            {
+                return EnumTypeCategory.Struct;
+            }
+            return EnumTypeCategory.Complex;
         }
         if (symbol.Name == "DateOnly")
         {

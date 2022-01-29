@@ -6,5 +6,6 @@ internal enum EnumTypeCategory
     TimeOnly,
     CustomEnum,
     StandardEnum,
-    Complex
+    Complex,
+    Struct //has to now account for structs since they require special treatment.
 }

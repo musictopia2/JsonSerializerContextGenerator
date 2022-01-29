@@ -1,9 +1,17 @@
-﻿namespace JsonSerializerContextGenerator;
+﻿using System.Diagnostics;
+
+namespace JsonSerializerContextGenerator;
 [Generator]
 public partial class MySourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+//#if DEBUG
+//        if (Debugger.IsAttached == false)
+//        {
+//            Debugger.Launch();
+//        }
+//#endif
         context.RegisterPostInitializationOutput(c =>
         {
             c.CreateCustomSource().AddAttributesToSourceOnly();

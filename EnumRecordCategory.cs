@@ -4,5 +4,6 @@ public enum EnumRecordCategory
     None,
     Class,
     Record,
+    Struct,
     Mixed
 }
