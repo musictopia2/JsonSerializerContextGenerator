@@ -150,6 +150,7 @@ internal static class SymbolExtensions
             {
                 return EnumTypeCategory.Struct;
             }
+            //if (symbol.gene)
             return EnumTypeCategory.Complex;
         }
         if (symbol.Name == "DateOnly")

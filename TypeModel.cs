@@ -9,6 +9,10 @@ internal record struct TypeModel
     public EnumTypeCategory TypeCategory { get; set; }
     public EnumRecordCategory RecordCategory { get; set; } = EnumRecordCategory.None;
     public ITypeSymbol? SymbolUsed { get; set; }
+    /// <summary>
+    /// this will be when there are generics but is not the custom lists though.
+    /// </summary>
+    public BasicList<ITypeSymbol> GenericsUsed { get; set; } = new();
     public string TypeName => SymbolUsed!.Name;
     public bool Nullable { get; set; }
     public string SerializerSimpleValue()

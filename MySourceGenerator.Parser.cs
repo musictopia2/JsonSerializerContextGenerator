@@ -267,6 +267,18 @@ public partial class MySourceGenerator
                 fins.SymbolUsed = symbol;
                 fins.FileName = symbol.Name;
                 fins.TypeCategory = fins.SymbolUsed.GetSimpleCategory();
+                var others = symbol.GetSingleGenericTypeUsed();
+                if (others is not null)
+                {
+                    fins.GenericsUsed = new()
+                    {
+                        others
+                    };
+                }
+                if (fins.GenericsUsed.Count == 1)
+                {
+                    fins.FileName = $"{symbol.Name}{others!.Name}";
+                }
                 if (fins.TypeCategory == EnumTypeCategory.Complex || fins.TypeCategory == EnumTypeCategory.Struct)
                 {
                     fins.RecordCategory = symbol.RecordCategory();

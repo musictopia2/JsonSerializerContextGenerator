@@ -82,6 +82,17 @@ internal static class WriterExtensions
         w.Write(info.GetGlobalNameSpace)
                .Write(".")
                .Write(info.TypeName);
+        if (info.GenericsUsed.Count == 1)
+        {
+            var used = info.GenericsUsed.Single();
+            //will do the generic stuff.
+            w.Write("<")
+            .GlobalWrite()
+                .Write(used.ContainingNamespace.ToDisplayString())
+                .Write(".")
+                .Write(used.Name)
+                .Write(">");
+        }
         if (info.Nullable)
         {
             w.Write(">");

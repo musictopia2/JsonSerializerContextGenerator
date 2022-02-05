@@ -244,8 +244,13 @@ public partial class MySourceGenerator
             {
                 w.WriteLine(w =>
                 {
-                    w.Write(symbol.Name)
-                    .Write("SerializeHandler(writer, value!.")
+                    w.Write(symbol.Name);
+                    ITypeSymbol? fins = p.GetSingleGenericTypeUsed();
+                    if (fins is not null)
+                    {
+                        w.Write(fins.Name);
+                    }
+                    w.Write("SerializeHandler(writer, value!.")
                     .Write(p.Name)
                     .Write("!);");
                 });
@@ -293,7 +298,7 @@ public partial class MySourceGenerator
                     .Write("!);");
                 });
             }
-#endregion
+            #endregion
             private string GetListValue(ITypeSymbol symbol, EnumListCategory list)
             {
                 string collectionName = symbol.Name;
@@ -320,7 +325,7 @@ public partial class MySourceGenerator
                 }
                 return $"{collectionName}{collectionName}{gg!.Name}";
             }
-#region Property Processes
+            #region Property Processes
             private void PropertyInitProcesses(ICodeBlock w)
             {
                 if (_info.ListCategory is not EnumListCategory.None)
@@ -365,6 +370,16 @@ public partial class MySourceGenerator
                         w.Write(_info.GetGlobalNameSpace)
                         .Write(".")
                         .Write(_info.TypeName);
+                        if (_info.GenericsUsed.Count == 1 && _info.TypeCategory == EnumTypeCategory.Complex)
+                        {
+                            ITypeSymbol fins = _info.GenericsUsed.Single();
+                            w.Write("<")
+                            .GlobalWrite()
+                            .Write(fins.ContainingNamespace.ToDisplayString())
+                            .Write(".")
+                            .Write(fins.Name)
+                            .Write(">");
+                        }
                     });
                     foreach (var p in list)
                     {
@@ -390,7 +405,15 @@ public partial class MySourceGenerator
                 }
                 else if (cat == EnumListCategory.None)
                 {
-                    nameUsed = p.Type.Name;
+                    ITypeSymbol? fins = p.Type.GetSingleGenericTypeUsed();
+                    if (fins is not null)
+                    {
+                        nameUsed = $"{p.Type.Name}{fins.Name}";
+                    }
+                    else
+                    {
+                        nameUsed = p.Type.Name;
+                    }
                 }
                 else
                 {
@@ -511,6 +534,16 @@ public partial class MySourceGenerator
                 .Write(className);
                 if (category == EnumListCategory.None)
                 {
+                    ITypeSymbol? fins = p.Type.GetSingleGenericTypeUsed();
+                    if (fins is not null)
+                    {
+                        w.Write("<")
+                        .GlobalWrite()
+                            .Write(fins.ContainingNamespace.ToDisplayString())
+                            .Write(".")
+                            .Write(fins.Name)
+                            .Write(">");
+                    }
                     return;
                 }
                 w.Write("<global::");
@@ -552,8 +585,8 @@ public partial class MySourceGenerator
                    .Write(">>>");
                 }
             }
-#endregion
-#region JsonInfo
+            #endregion
+            #region JsonInfo
             private void JsonTypeProcess(ICodeBlock w)
             {
                 VariableInformation variable = _info.GetVariableInformation();
@@ -873,7 +906,7 @@ public partial class MySourceGenerator
                     .Write("));");
                 });
             }
-#endregion
+            #endregion
         }
     }
 }
