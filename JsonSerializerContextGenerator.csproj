@@ -8,7 +8,7 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<Description>Source generator that creates JsonSerializerContext classes from any class using attributes or fluent style</Description>
 		<PackageProjectUrl>https://github.com/musictopia2/JsonSerializerContextGenerator</PackageProjectUrl>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 	</PropertyGroup>
 	
 	<PropertyGroup>

@@ -80,17 +80,18 @@ public partial class MySourceGenerator
                             .Write(".JsonConverterProcesses.GlobalJsonConverterClass.AddEnumConverters();");
                         });
                     }
+                    //global::CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.JsonSerializers.MultipleContextHelpers<global::SerializeGenericsBug.SampleClass>.ContextAction = options => options.AddContext<global::SerializeGenericsBug.SampleClassContext>();
                     foreach (var r in _results)
                     {
                         if (r.PropertyNames.Count > 0)
                         {
                             w.WriteLine(w =>
                             {
-                                w.Write("global::CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.JsonSerializers.MultipleContextHelpers.AddContext<")
+                                w.Write("global::CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.JsonSerializers.MultipleContextHelpers<")
                                 .Write(r.GetGlobalName)
-                                .Write(">(options => options.AddContext<")
+                                .Write(">.ContextAction = options => options.AddContext<")
                                 .Write(r.GetGlobalName)
-                                .Write("Context>());");
+                                .Write("Context>();");
                             });
                         }
                     }
