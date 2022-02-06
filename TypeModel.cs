@@ -4,7 +4,7 @@ internal record struct TypeModel
     public string GetGlobalNameSpace => $"global::{SymbolUsed!.ContainingNamespace.ToDisplayString()}";
     public string CollectionNameSpace { get; set; } = "";
     public string CollectionStringName { get; set; } = "";
-    public string FileName { get; set; } = "";
+    public string FileName { get; set; } = ""; //try to search by filename now.
     public EnumListCategory ListCategory { get; set; }
     public EnumTypeCategory TypeCategory { get; set; }
     public EnumRecordCategory RecordCategory { get; set; } = EnumRecordCategory.None;
@@ -15,6 +15,7 @@ internal record struct TypeModel
     public BasicList<ITypeSymbol> GenericsUsed { get; set; } = new();
     public string TypeName => SymbolUsed!.Name;
     public bool Nullable { get; set; }
+    
     public string SerializerSimpleValue()
     {
         if (TypeCategory == EnumTypeCategory.StandardSimple)

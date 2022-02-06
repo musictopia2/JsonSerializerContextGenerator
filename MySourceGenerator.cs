@@ -84,7 +84,7 @@ public partial class MySourceGenerator : IIncrementalGenerator
             Emitter emitter = new(context, info, compilation);
             emitter.Emit();
         }
-        catch
+        catch(Exception)
         {
 
         }

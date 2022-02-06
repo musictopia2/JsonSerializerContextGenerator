@@ -134,7 +134,10 @@ public partial class MySourceGenerator
                     fins.FileName = makeType.Name;
                     fins.Nullable = false;
                     fins.RecordCategory = makeType.RecordCategory();
-                    _types.Add(fins);
+                    if (_types.Any(x => x.FileName == fins.FileName) == false)
+                    {
+                        _types.Add(fins);
+                    }
                     result.Types = _types;
                     AddResults(result, fluent);
                     var seconds = ParseUtils.FindCallsOfMethodInConfigLambda(context, firsts.Single(), nameof(IFinalConfig<object>.Ignore), optional: true);
@@ -205,7 +208,10 @@ public partial class MySourceGenerator
                             fins.FileName = $"{others.Name}{others.Name}{mm!.Name}";
                             fins.SymbolUsed = mm;
                             fins.TypeCategory = fins.SymbolUsed.GetSimpleCategory();
-                            _types.Add(fins);
+                            if (_types.Any(x => x.FileName == fins.FileName) == false)
+                            {
+                                _types.Add(fins);
+                            }
                             AddListNames(mm, others, results);
                             continue;
                         }
@@ -220,7 +226,10 @@ public partial class MySourceGenerator
                         {
                             fins.FileName = $"{others.Name}{others.Name}Nullable{gg.Name}";
                         }
-                        _types.Add(fins);
+                        if (_types.Any(x => x.FileName == fins.FileName) == false)
+                        {
+                            _types.Add(fins);
+                        }
                         AddListNames(mm, others, results);
                         continue;
                     }
@@ -242,7 +251,10 @@ public partial class MySourceGenerator
                 fins.SymbolUsed = symbol;
                 fins.TypeCategory = fins.SymbolUsed.GetSimpleCategory();
                 fins.FileName = $"{name}{symbol.Name}";
-                _types.Add(fins);
+                if (_types.Any(x => x.FileName == fins.FileName) == false)
+                {
+                    _types.Add(fins);
+                }
                 AddSimpleName(symbol, results);
                 return;
             }
@@ -250,7 +262,10 @@ public partial class MySourceGenerator
             fins.SymbolUsed = mm;
             fins.TypeCategory = fins.SymbolUsed.GetSimpleCategory();
             fins.FileName = $"{name}Nullable{mm.Name}";
-            _types.Add(fins);
+            if (_types.Any(x => x.FileName == fins.FileName) == false)
+            {
+                _types.Add(fins);
+            }
             AddSimpleName(symbol, results);
         }
         private void AddSimpleName(IPropertySymbol symbol, ResultsModel results)
@@ -282,11 +297,17 @@ public partial class MySourceGenerator
                 if (fins.TypeCategory == EnumTypeCategory.Complex || fins.TypeCategory == EnumTypeCategory.Struct)
                 {
                     fins.RecordCategory = symbol.RecordCategory();
-                    _types.Add(fins);
+                    if (_types.Any(x => x.FileName == fins.FileName) == false)
+                    {
+                        _types.Add(fins);
+                    }
                     PopulateNames((INamedTypeSymbol)symbol, results);
                     return;
                 }
-                _types.Add(fins);
+                if (_types.Any(x => x.FileName == fins.FileName) == false)
+                {
+                    _types.Add(fins);
+                }
                 return;
             }
             else
@@ -300,7 +321,10 @@ public partial class MySourceGenerator
                     {
                         fins.FileName = $"Nullable{others!.Name}";
                         fins.Nullable = true;
-                        _types.Add(fins);
+                        if (_types.Any(x => x.FileName == fins.FileName) == false)
+                        {
+                            _types.Add(fins);
+                        }
                         fins = new();
                         fins.Nullable = false;
                         fins.ListCategory = EnumListCategory.None;
@@ -309,19 +333,28 @@ public partial class MySourceGenerator
                     }
                     fins.FileName = others!.Name;
                     fins.RecordCategory = symbol.RecordCategory();
-                    _types.Add(fins);
+                    if (_types.Any(x => x.FileName == fins.FileName) == false)
+                    {
+                        _types.Add(fins);
+                    }
                     PopulateNames((INamedTypeSymbol)others!, results);
                     return;
                 }
                 fins.FileName = $"Nullable{others!.Name}";
-                _types.Add(fins);
+                if (_types.Any(x => x.FileName == fins.FileName) == false)
+                {
+                    _types.Add(fins);
+                }
                 fins = new();
                 fins.Nullable = false;
                 fins.ListCategory = EnumListCategory.None;
                 fins.FileName = others!.Name;
                 fins.SymbolUsed = others;
                 fins.TypeCategory = fins.SymbolUsed.GetSimpleCategory();
-                _types.Add(fins);
+                if (_types.Any(x => x.FileName == fins.FileName) == false)
+                {
+                    _types.Add(fins);
+                }
             }
         }
     }
