@@ -1,7 +1,7 @@
 ﻿namespace JsonSerializerContextGenerator;
-internal record struct TypeModel
+internal record struct TypeModel()
 {
-    public string GetGlobalNameSpace => $"global::{SymbolUsed!.ContainingNamespace.ToDisplayString()}";
+    public readonly string GetGlobalNameSpace => $"global::{SymbolUsed!.ContainingNamespace.ToDisplayString()}";
     public string CollectionNameSpace { get; set; } = "";
     public string CollectionStringName { get; set; } = "";
     public string FileName { get; set; } = ""; //try to search by filename now.
@@ -13,10 +13,10 @@ internal record struct TypeModel
     /// this will be when there are generics but is not the custom lists though.
     /// </summary>
     public BasicList<ITypeSymbol> GenericsUsed { get; set; } = new();
-    public string TypeName => SymbolUsed!.Name;
+    public readonly string TypeName => SymbolUsed!.Name;
     public bool Nullable { get; set; }
     
-    public string SerializerSimpleValue()
+    public readonly string SerializerSimpleValue()
     {
         if (TypeCategory == EnumTypeCategory.StandardSimple)
         {
@@ -40,7 +40,7 @@ internal record struct TypeModel
         }
         return "";
     }
-    public VariableInformation GetVariableInformation()
+    public readonly VariableInformation GetVariableInformation()
     {
         string camel;
         //try just with file name all the time (?)
@@ -89,7 +89,7 @@ internal record struct TypeModel
         }
         return TypeCategory == EnumTypeCategory.Complex;
     }
-    public bool HasStandardObject()
+    public readonly bool HasStandardObject()
     {
         var list = SymbolUsed!.GetAllPublicProperties();
         foreach (var p in list)

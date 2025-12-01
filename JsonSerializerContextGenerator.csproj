@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -9,6 +9,9 @@
 		<Description>Source generator that creates JsonSerializerContext classes from any class using attributes or fluent style</Description>
 		<PackageProjectUrl>https://github.com/musictopia2/JsonSerializerContextGenerator</PackageProjectUrl>
 		<Version>1.0.5</Version>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<RunPostBuildAppCondition Condition="'$(Configuration)' == 'Release'">true</RunPostBuildAppCondition>
+		<FeedType>Public</FeedType>
 	</PropertyGroup>
 	
 	<PropertyGroup>
@@ -20,11 +23,14 @@
 	</ItemGroup>
 	<ItemGroup>
 
-		<PackageReference Include="AttributesSourceGeneratorHelper" Version="3.0.1" PrivateAssets="all" />
-		<PackageReference Include="GenerateHelperLibraries" Version="2.0.4" PrivateAssets="all" />
-		<PackageReference Include="CommonSourceGeneratorsHelpers" Version="2.0.28" PrivateAssets="all" />
-
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
+		<PackageReference Include="AttributesSourceGeneratorHelper" Version="3.0.9" PrivateAssets="all" />
+		<PackageReference Include="GenerateHelperLibraries" Version="2.0.19" PrivateAssets="all" />
+		<PackageReference Include="CommonSourceGeneratorsHelpers" Version="2.0.87" PrivateAssets="all" />
+		<PackageReference Include="SourceGeneratorsAttributesLibrary" Version="1.0.3" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
 	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="C:\VS\OneNet\Apps\CommandLines\PostBuildPackageHandler\bin\Release\net9.0\PostBuildPackageHandler.exe $(ProjectName) $(ProjectDir) $(ProjectFileName) $(TargetDir)" Condition="'$(Configuration)' == 'Release' and '$(RunPostBuildAppCondition)' == 'true'" />
+	</Target>
 </Project>
